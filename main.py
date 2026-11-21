@@ -8,6 +8,8 @@ HOURS = 24
 SOLAR_LIMIT = 200.0
 BATTERY_CAPACITY = 100.0
 GENERATOR_COST = 1.0
+battery_charge = 0.0
+#this should be here not down there
 
 with socket.create_connection((HOST, PORT)) as sock:
     for hour in range(HOURS):
@@ -60,7 +62,7 @@ with socket.create_connection((HOST, PORT)) as sock:
             #just in case of grid failure
             #realistically only wasting 100 dollars? since paying for whta you use after
             #last round just use all battery
-        battery_charge = 0.0
+            
         battery_used = 0.0
         if event != "battery_failure":
             #obviously
@@ -93,5 +95,52 @@ with socket.create_connection((HOST, PORT)) as sock:
 
         battery_charge += generator
         #battery charge + whatever the generator makes
+        
+        #boring json return part
+        allocations = []
+        solar_left = solarable_load
+        battery_left = battery_used
+
+
+        #retunr format is solar -> battery -> grid
+        #so calculate in that order ig
+        for building in buildings:
+            #similar to loop above
+            demand = building["load"]
+            solar = 0.0
+
+
+            if building["type"] != "lecture_hall":
+                solar = min(demand, solar_left)
+                solar_left -= solar
+                #solar is either the demand or solar_left
+                #so this gets how much of the building is solarable
+                
+            battery = min(demand - solar, battery_left)
+            battery_left -= battery
+            #gets how much of the buiilding is batteryable
+            #0 if its all covered by solar
+            #if no battery is left than its just 0 for battery_left so it goes to grid obv
+
+            #if battery is all gone + solar
+            #grid covers rest so
+            grid = demand - solar - battery
+
+            allocations.append({
+                "solar": solar,
+                "battery": battery,
+                "grid": grid
+            #add the building's stats to the list so its in the nice format
+            })
+
+        response = {
+            #send back the list of buildings + stats
+            "buildings": allocations,
+            "generator": generator
+            #and the generator used that hour
+        }
+
+        response_json = json.dumps(response)
+        sock.sendall((response_json + "\n").encode("utf-8"))
         
 
