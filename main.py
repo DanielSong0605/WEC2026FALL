@@ -11,14 +11,27 @@ GENERATOR_COST = 1.0
 battery_charge = 0
 #this should be here not down there
 
+buffer = ""
+decoder = json.JSONDecoder()
+
 with socket.create_connection((HOST, PORT)) as sock:
+    #thank you reddit? if it works
     for hour in range(HOURS):
-        message = sock.recv(4096) #4096 should be enough
+        while True:
+            buffer = buffer.lstrip()
 
-        if not message:
-            break
+            try:
+                data, end = decoder.raw_decode(buffer)
+                buffer = buffer[end:]
+                break
 
-        data = json.loads(message.decode("utf-8"))
+            except json.JSONDecodeError:
+                chunk = sock.recv(4096)
+
+                if not chunk:
+                    raise ConnectionError("Tester disconnected")
+
+                buffer += chunk.decode("utf-8")
 
         event = data["random_event"] #random event
         forecast = data["forecast"] #forecast cloudy/not cloudy for NEXT hour
@@ -88,7 +101,7 @@ with socket.create_connection((HOST, PORT)) as sock:
         #putting this above like i did earlier would be cheating
         if hour < HOURS - 1:
             #as long as its not the 23 hour
-            if event != "generator_failure" and event != "battery_failure":
+            if event != "generator_failure": #took ou t!= batteR_faliue cause victoria has a great point
                 #obviously
                 generator = BATTERY_CAPACITY - battery_charge
                 #generator produces whatever is needed to make battery full
