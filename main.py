@@ -5,10 +5,10 @@ HOST = "localhost"
 PORT = 8800
 HOURS = 24
 
-SOLAR_LIMIT = 200.0
-BATTERY_CAPACITY = 100.0
+SOLAR_LIMIT = 200
+BATTERY_CAPACITY = 100
 GENERATOR_COST = 1.0
-battery_charge = 0.0
+battery_charge = 0
 #this should be here not down there
 
 with socket.create_connection((HOST, PORT)) as sock:
@@ -26,9 +26,9 @@ with socket.create_connection((HOST, PORT)) as sock:
         buildings = data["loads"] #type for types - load for loads
     
         solar_left = SOLAR_LIMIT #kinda redundant i think but im stupid so idc
-        load = 0.0 
-        solarable_load = 0.0
-        demand = 0.0
+        load = 0
+        solarable_load = 0
+        demand = 0
         #declaring all of these here for my own sake
 
         if event == "cloudy_weather": 
@@ -108,7 +108,6 @@ with socket.create_connection((HOST, PORT)) as sock:
             #similar to loop above
             demand = building["load"]
             solar = 0.0
-
 
             if building["type"] != "lecture_hall":
                 solar = min(demand, solar_left)
