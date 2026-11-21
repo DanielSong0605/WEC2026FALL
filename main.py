@@ -45,7 +45,7 @@ with socket.create_connection((HOST, PORT)) as sock:
         #declaring all of these here for my own sake
 
         if event == "cloudy_weather": 
-            solar_left = 0.0 #no solar usable in cloudy weather
+            solar_left = 0 #no solar usable in cloudy weather
 
         for building in buildings:
             demand = building["load"] 
@@ -76,7 +76,7 @@ with socket.create_connection((HOST, PORT)) as sock:
             #realistically only wasting 100 dollars? since paying for whta you use after
             #last round just use all battery
             
-        battery_used = 0.0
+        battery_used = 0
         if event != "battery_failure":
             #obviously
             if (price > GENERATOR_COST or event == "grid_failure" or hour == HOURS - 1):
@@ -94,7 +94,7 @@ with socket.create_connection((HOST, PORT)) as sock:
         battery_charge -= battery_used
         #charge - the amount used
         
-        generator = 0.0
+        generator = 0
 
 
         #this goes down here since charge happens the hour before
@@ -120,7 +120,7 @@ with socket.create_connection((HOST, PORT)) as sock:
         for building in buildings:
             #similar to loop above
             demand = building["load"]
-            solar = 0.0
+            solar = 0
 
             if building["type"] != "lecture_hall":
                 solar = min(demand, solar_left)
