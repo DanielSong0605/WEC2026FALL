@@ -77,8 +77,9 @@ with socket.create_connection((HOST, PORT)) as sock:
             #last round just use all battery
             
         battery_used = 0
-        if event != "battery_failure":
-            #obviously
+        if event != "battery_failure" and event != "generator_failure":
+            #have to account for generator_failure too for generator_failure followed by
+            #worst case grid_failure event otherwise blackout
             if (price > GENERATOR_COST or event == "grid_failure" or hour == HOURS - 1):
                 #like above, if the grid cost is more than 1.0, gird failure is in play,
                 #or its the 24 hour then use battery_charge
