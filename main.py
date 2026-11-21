@@ -35,7 +35,7 @@ with socket.create_connection((HOST, PORT)) as sock:
 
         event = data["random_event"] #random event
         forecast = data["forecast"] #forecast cloudy/not cloudy for NEXT hour
-        price = data["grid_price"] #data grid price
+        price = data["grid_cost"] #data grid price
         buildings = data["loads"] #type for types - load for loads
     
         solar_left = SOLAR_LIMIT #kinda redundant i think but im stupid so idc
